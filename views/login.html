@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>CRM系统</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport' />
+		<% include ./components/scriptCSS.html %>
+		<% include ./components/scriptJS.html %>
+		<!--[if lt IE 9]>
+	    <script src='assets/javascripts/html5shiv.js' type='text/javascript'></script>
+	    <![endif]-->
+		<link rel="shortcut icon" href="assets/images/favicon.ico">
+	</head>
+
+	<body class='contrast-red sign-in contrast-background'>
+		<style>
+			html {
+				overflow-x: hidden;
+				overflow-y: hidden;
+			}
+		</style>
+		<div id='wrapper' style="margin-bottom: 400px;">
+			<div class='application'>
+				<div class='application-content'>
+					<a href="/">
+						<div class=''><img src="assets/images/favicon.ico"/></div>
+						<span>CRM系统</span>
+					</a>
+				</div>
+			</div>
+			<div class='controls'>
+				<div class='caret'></div>
+				<div class='form-wrapper'>
+					<h1 class='text-center'>登录</h1>
+					<fo-rm accept-charset="UTF-8"/>
+						<div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+						<div class='row-fluid'>
+							<div class='span12 icon-over-input'>
+								<input class="span12" id="username" name="username" placeholder="工号" type="text" value="" />
+								<i class='icon-user muted'></i>
+							</div>
+						</div>
+						<div class='row-fluid'>
+							<div class='span12 icon-over-input'>
+								<input class="span12" id="password" name="password" placeholder="密码" type="password" value="" />
+								<i class='icon-lock muted'></i>
+							</div>
+						</div>
+						<label class="checkbox" for="remember_me"><input id="remember_me" name="remember_me" type="checkbox" value="1" />
+	                    记住密码
+	                	</label>
+						<button id="loginBut" class="btn btn-block" name="button" type="submit">登录</button>
+					</form>
+					<div class='text-center'>
+						<hr class='hr-normal' />
+						<a href="loginRePwd">忘记密码?</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			function send(_tyep, _contentType, _url, _data,_headers, _result) {
+				$.ajax({
+					timeout: 1000, //超时时间设置，单位毫秒
+					type: _tyep,
+					contentType: _contentType, //必须加    
+					url: _url,
+					data: _data,
+					headers:_headers,
+					success: function(data) {
+					},
+					error: function(data) {
+						alert("登录失败");
+					}
+				});
+			}
+			//备份
+			$("#loginBut").click(function() {
+				var _url="http://127.0.0.1:9001/security/login"
+				var _data = {
+					username: $("#username").val(),
+					password: $("#password").val()
+				}
+				var _headers= {
+					role:"crm"
+				}
+				send(
+					"POST",
+					"application/json",
+					_url,
+					_data,
+					_headers,
+					null
+				);
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>CRM系统</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport' />
+		<% include ./components/scriptCSS.html %>
+		<% include ./components/scriptJS.html %>
+		<!--[if lt IE 9]>
+	    <script src='assets/javascripts/html5shiv.js' type='text/javascript'></script>
+	    <![endif]-->
+		<link rel="shortcut icon" href="assets/images/favicon.ico">
+	</head>
+
+	<body class='contrast-red'>
+		<style>
+			html { overflow-x: hidden; overflow-y: auto; }
+		</style>
+		<% include ./components/topBar.html %>
+		<div id='wrapper'>
+			<div id='main-nav-bg'></div>
+			<% include ./components/leftMenu.html %>
+			<% include ./components/noScript.html %>
+			<section id='content'>
+				<div class='container-fluid'>
+					<div class='row-fluid' id='content-wrapper'>
+						<div class='span12'>
+							<div class='page-header'>
+								<h1 class='pull-left'>
+        							<i class='icon-dashboard'></i>
+        							<span>仪表盘</span>
+   			 					</h1>
+								<div class='pull-right'>
+									<ul class='breadcrumb'>
+	                                    <li>
+	                                        <a href="index"><i class='icon-bar-chart'></i>
+	                                        </a>
+	                                    </li>
+	                                    <li class='separator'>
+	                                        <i class='icon-angle-right'></i>
+	                                    </li>
+	                                    <li>
+	                                        仪表盘
+	                                    </li>
+	                                </ul>
+								</div>
+							</div>
+							<div class='row-fluid'>
+								<div class='span12 box box-transparent'>
+									<div class='row-fluid'>
+										<div class='span2 box-quick-link blue-background'>
+											<a href='customerAdd'>
+												<div class='header'>
+													<div class='icon-comments'></div>
+												</div>
+												<div class='content'>顾客管理</div>
+											</a>
+										</div>
+										<div class='span2 box-quick-link green-background'>
+											<a href='orderType'>
+												<div class='header'>
+													<div class='icon-star'></div>
+												</div>
+												<div class='content'>工单管理</div>
+											</a>
+										</div>
+										<div class='span2 box-quick-link orange-background'>
+											<a href='reportOut'>
+												<div class='header'>
+													<div class='icon-magic'></div>
+												</div>
+												<div class='content'>报表管理</div>
+											</a>
+										</div>
+										<div class='span2 box-quick-link purple-background'>
+											<a href='callOut'>
+												<div class='header'>
+													<div class='icon-eye-open'></div>
+												</div>
+												<div class='content'>呼叫管理</div>
+											</a>
+										</div>
+										<div class='span2 box-quick-link red-background'>
+											<a href='qcModel'>
+												<div class='header'>
+													<div class='icon-inbox'></div>
+												</div>
+												<div class='content'>录音质检</div>
+											</a>
+										</div>
+										<div class='span2 box-quick-link muted-background'>
+											<a href='user'>
+												<div class='header'>
+													<div class='icon-refresh'></div>
+												</div>
+												<div class='content'>个人中心</div>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</body>
+
+</html>
