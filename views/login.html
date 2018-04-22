@@ -59,42 +59,34 @@
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
-			function send(_tyep, _contentType, _url, _data,_headers, _result) {
-				$.ajax({
-					timeout: 1000, //超时时间设置，单位毫秒
-					type: _tyep,
-					contentType: _contentType, //必须加    
-					url: _url,
-					data: _data,
-					headers:_headers,
-					success: function(data) {
-					},
-					error: function(data) {
-						alert("登录失败");
-					}
+	<script type="text/javascript">
+       $(function(){
+	        $("#loginBut").click(function(){
+		    	var params ={
+	    			username: $("#username").val(),
+	    			password: $("#password").val(),
+	    			token:"crm"
+	    		};
+		    	$.ajax({
+				    url:'http://localhost:9001/security/login',
+				    type:'post',
+				    async:false,//同步：意思是当有返回值以后才会进行后面的js程序。
+				    dataType:'text',
+				    data: JSON.stringify(params),
+				    success: function(data){
+				        var userAllInfo=$.parseJSON(data);
+				        var loginEntity=userAllInfo["loginEntity"];
+				        var sessionId=loginEntity["id"];
+				        $.session.set(JSON.stringify(sessionId),JSON.stringify(loginEntity));
+				        window.location.href = '/index';
+				    },
+				    error: function(res){
+		            	alert("登录失败");
+		            }
 				});
-			}
-			//备份
-			$("#loginBut").click(function() {
-				var _url="http://127.0.0.1:9001/security/login"
-				var _data = {
-					username: $("#username").val(),
-					password: $("#password").val()
-				}
-				var _headers= {
-					role:"crm"
-				}
-				send(
-					"POST",
-					"application/json",
-					_url,
-					_data,
-					_headers,
-					null
-				);
-			});
-		</script>
+    	});
+	});
+    </script>
 	</body>
 
 </html>
