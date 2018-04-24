@@ -68,32 +68,22 @@
 											<div class='scrollable-area'>
 												<form style="margin-left: 10px;">
 													<div class='control-group info'>
-														<label class='control-label' for='inputInfo'>姓名：</label>
+														<label class='control-label' for='inputInfo'>账号：</label>
 														<div class='controls'>
-															<input id='' class="span10" placeholder="张三" type='text' />
+															<input id='_username'  readonly="readonly" class="span10" value="默认值" type='text' />
 														</div>
 													</div>
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>昵称：</label>
 														<div class='controls'>
-															<input id='' class="span10" placeholder="张三" type='text' />
+															<input id='_login_name'  readonly="readonly" class="span10" value="默认值" type='text' />
 														</div>
 													</div>
 													<div class='control-group info'>
-														<label class='control-label' for='inputInfo'>账号：</label>
+														<label class='control-label' for='inputInfo'>邮箱：</label>
 														<div class='controls'>
-															<input id='' class="span10" placeholder="123456" type='text' />
+															<input id='_email'  readonly="readonly" class="span10" value="默认值" type='text' />
 														</div>
-													</div>
-													<div class=''>
-														<button class='btn btn-primary' type='submit'>
-									                        <i class='icon-save'></i>
-									                        	保存
-									                    </button>
-														<button class='btn' type=''>
-									                    	<i class='icon-eject'></i>
-									                    		取消
-									                    </button>
 													</div>
 												</form>
 												<br/>
@@ -107,5 +97,18 @@
 				</div>
 			</section>
 		</div>
+		<script type="text/javascript">
+	       $(function(){
+	    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
+		   		var userAllInfoJson=$.parseJSON(userAllInfo);
+		        var user=userAllInfoJson["user"];
+		        var login_name=user["login_name"];
+		        var username=user["username"];
+	    		var email=user["email"];
+	    		$("#_login_name").val(login_name);
+	    		$("#_username").val(username);
+	    		$("#_email").val(email);
+			});
+	    </script>
 	</body>
 </html>

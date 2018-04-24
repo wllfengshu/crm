@@ -53,7 +53,7 @@
 								</div>
 							</div>
 							<div class='row-fluid'>
-								<div class='span12 box bordered-box blue-border' style='margin-bottom:0;'>
+								<div class='span4 box bordered-box blue-border' style='margin-bottom:0;'>
 									<div class='box-header blue-background'>
 										<div class='title'>修改密码</div>
 										<div class='actions'>
@@ -66,31 +66,31 @@
 									<div class='box-content box-no-padding'>
 										<div class='responsive-table'>
 											<div class='scrollable-area'>
-												<form style="margin-left: 100px;">
+												<form style="margin-left: 10px;">
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>旧密码：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入旧密码" type='text' />
+															<input id='oldPwd' class="span10" placeholder="请输入之前的密码" type='password' />
 														</div>
 													</div>
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>新密码：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入新密码" type='text' />
+															<input id='newPwd1' class="span10" placeholder="请输入新密码" type='password' />
 														</div>
 													</div>
 													<div class='control-group info'>
-														<label class='control-label' for='inputInfo'>新密码：</label>
+														<label class='control-label' for='inputInfo'>确认密码：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入新密码" type='text' />
+															<input id='newPwd2' class="span10" placeholder="请再次输入新密码" type='password' />
 														</div>
 													</div>
 													<div class=''>
-														<button class='btn btn-primary' type='submit'>
+														<button id="userRePwdBut" class='btn btn-primary' type='button'>
 									                        <i class='icon-save'></i>
 									                        	保存
 									                    </button>
-														<button class='btn' type=''>
+														<button class='btn' type='' disabled="disabled">
 									                    	<i class='icon-eject'></i>
 									                    		取消
 									                    </button>
@@ -107,5 +107,57 @@
 				</div>
 			</section>
 		</div>
+		<script type="text/javascript">
+		        $("#userRePwdBut").click(function(){
+		        	var _oldPwd=$("#oldPwd").val();
+		        	var _newPwd1=$("#newPwd1").val();
+		        	var _newPwd2=$("#newPwd2").val();
+		        	if(_oldPwd==null || _oldPwd==null || _newPwd1==null || _newPwd1==null || _newPwd2==null || _newPwd2==null ){
+		        		alert("输入不能为空");
+		        	}
+		        	if(_newPwd1 != _newPwd2){
+		        		alert("两次密码不一致");
+		        		$("#oldPwd").val("");
+		        		$("#newPwd1").val("");
+		        		$("#newPwd2").val("");
+		        		return;
+		        	}
+		    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
+			   		var userAllInfoJson=$.parseJSON(userAllInfo);
+			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
+			        var user=userAllInfoJson["user"];
+			        var user_id=user["id"];
+		    		var _headers= {
+						"sessionId":sessionId,
+						"user_id":user_id
+					}
+		    		var params ={
+		    			oldPwd: _oldPwd,
+		    			newPwd1: _newPwd1,
+		    			newPwd2: _newPwd2,
+		    			token:"manage"
+		    		};
+			    	$.ajax({
+					    url:'http://localhost:9001/security/repwd',
+					    type:'post',
+					    async:false,//同步：意思是当有返回值以后才会进行后面的js程序。
+					    dataType:'text',
+					    data: JSON.stringify(params),
+					    headers:_headers,
+					    success: function(data){
+					        alert("修改密码成功");
+					        $("#oldPwd").val("");
+			        		$("#newPwd1").val("");
+			        		$("#newPwd2").val("");
+					    },
+					    error: function(res){
+			            	alert("修改密码失败");
+			            	$("#oldPwd").val("");
+			        		$("#newPwd1").val("");
+			        		$("#newPwd2").val("");
+			            }
+					});
+				});
+	    </script>
 	</body>
 </html>

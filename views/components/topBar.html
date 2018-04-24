@@ -12,12 +12,12 @@
 				<ul class='nav pull-right'>
 					<li class='dropdown dark user-menu'>
 						<a class='dropdown-toggle' data-toggle='dropdown' href='#'>
-							欢迎您，<span class='user-name hidden-phone'>张三</span>
+							欢迎您，<span id="login_name" class='user-name hidden-phone'>默认值</span>
 							<b class='caret'></b>
 						</a>
 						<ul class='dropdown-menu'>
 							<li>
-								<a href='userInfo'>
+								<a href='user'>
 									<i class='icon-user'></i> 个人信息
 								</a>
 							</li>
@@ -38,4 +38,27 @@
 			</div>
 		</div>
 	</div>
+	<div id="messageTitle" style="position: absolute; z-index: 99;text-align:center;width: 80%;" class="animated bounceInDown">
+		<p v-if="show" style="background-color: #FF1111;">登录超时，请重新登录</p>
+	</div>
+	<script type="text/javascript">
+       $(function(){
+	       	/**
+	       	 * $.parseJSON(str);//字符串转对象
+	       	 * JSON.stringify(obj);//对象转字符串
+	       	 */
+	   		var userAllInfo=$.session.get("loginUserAllInfo_crm");
+	   		if (typeof(userAllInfo) == "undefined" ) {
+	   			window.location.href = '/login';
+	   		}
+	   		new Vue({
+   				el:"#messageTitle",
+   				data:{show:false}
+   			});
+	   		var userAllInfoJson=$.parseJSON(userAllInfo);
+	        var user=userAllInfoJson["user"];//返回的还是一个json对象
+	        var login_name=user["login_name"];
+	        $("#login_name").html(login_name);
+       });
+    </script>
 </header>
