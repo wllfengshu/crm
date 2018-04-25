@@ -55,11 +55,11 @@
 							<div class='row-fluid'>
 								<div class="span12 box ">
 	                                <a>坐席工号：</a>
-	                                <input class="" placeholder="请输入坐席工号" id="" type="text">
+	                                <input class="" placeholder="请输入坐席工号" id="_ani" type="text">
 	                                &nbsp;&nbsp;
 	                                <a>顾客电话：</a>
-	                                <input class="" placeholder="请输入顾客电话" id="" type="text">
-	                                <button class="btn btn-primary btn-success">
+	                                <input class="" placeholder="请输入顾客电话" id="_dnis" type="text">
+	                                <button id="queryBut" class="btn btn-primary btn-success">
 			                            <i class="icon-search"></i>
 			                            	查询
 			                        </button>
@@ -77,26 +77,23 @@
 									<div class='box-content box-no-padding'>
 										<div class='responsive-table'>
 											<div class='scrollable-area'>
-												<table class='table' style='margin-bottom:0;'>
+												<table  id="havaTable"  class='table' style='margin-bottom:0;'>
 													<thead>
 														<tr>
 															<th>
 																编号
 															</th>
 															<th>
-																顾客姓名
-															</th>
-															<th>
 																顾客电话
-															</th>
-															<th>
-																坐席工号
 															</th>
 															<th>
 																呼出时间
 															</th>
 															<th>
-																通话时长（秒）
+																结束时间
+															</th>
+															<th>
+																挂断方式
 															</th>
 															<th>
 																操作
@@ -104,25 +101,26 @@
 														</tr>
 													</thead>
 													<tbody>
-														<tr>
-															<td>1</td>
-															<td>小新</td>
-															<td>1361234567</td>
-															<td>5001</td>
-															<td>2018.04.01 19:10:15</td>
-															<td>23</td>
-															<td>
-																<a class='btn btn-success btn-mini' href='#'>
-																	<i class='icon-edit'></i>
-																</a>
-																<a class='btn btn-success btn-mini' href='#'>
-																	<i class='icon-ok'></i>
-																</a>
-																<a class='btn btn-danger btn-mini' href='#'>
-																	<i class='icon-remove'></i>
-																</a>
-															</td>
-														</tr>
+														<template>
+															<tr v-for="todo in todos" >
+																<td v-text="todo.id"></td>
+																<td v-text="todo.dnis"></td>
+																<td v-text="todo.begin_time"></td>
+																<td v-text="todo.end_time"></td>
+																<td v-text="todo.end_type_name"></td>
+																<td>
+																	<a class='btn btn-success btn-mini' href='#'>
+																		<i class='icon-edit'></i>
+																	</a>
+																	<a class='btn btn-success btn-mini' href='#'>
+																		<i class='icon-ok'></i>
+																	</a>
+																	<a class='btn btn-danger btn-mini' href='#'>
+																		<i class='icon-remove'></i>
+																	</a>
+																</td>
+															</tr>
+														</template>
 													</tbody>
 												</table>
 												<div class="span6 text-right">
@@ -150,5 +148,62 @@
 				</div>
 			</section>
 		</div>
+		<script type="text/javascript">
+	       $(function(){
+	       		function spliceGetStr(params){//拼接get请求
+	       			var strTemp="";
+	       			for (var variable in params) {
+	       				strTemp+=variable+"="+params[variable]+"&"
+	       			}
+	       			if(strTemp.length>0){
+	       				strTemp=strTemp.substr(0,strTemp.length-1);
+	       			}
+	       			return strTemp;
+	       		}
+		        $("#queryBut").click(function(){
+			    	var params ={
+		    			_ani: $("#_ani").val(),
+		    			_dnis: $("#_dnis").val(),
+		    			pageNo:1,
+		    			pageSize:99,
+		    			token:"crm"
+		    		};
+		    		var paramsGetStr="?"+spliceGetStr(params);
+		    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
+			   		var userAllInfoJson=$.parseJSON(userAllInfo);
+			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
+			        var user=userAllInfoJson["user"];
+			        var user_id=user["id"];
+		    		var _headers= {
+						"sessionId":sessionId,
+						"user_id":user_id,
+						"call_type":"1"
+					}
+			    	$.ajax({
+					    url:'http://localhost:7006/record/'+paramsGetStr,
+					    type:'get',
+					    dataType:'text',
+					    headers:_headers,
+					    success: function(_data){
+					    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
+				        	var infoData=infoRes["data"];//取到data
+				        	if(infoData==""){
+				        		alert("查询为空");
+				        	}else{
+				        		new Vue({
+					   				el:"#havaTable",
+					   				data:{
+					   					todos:infoData
+					   				}
+					   			});
+				        	}
+					    },
+					    error: function(res){
+			            	alert("查询失败");
+			            }
+					});
+	    		});
+			});
+	    </script>
 	</body>
 </html>

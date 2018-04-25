@@ -30,18 +30,6 @@ router.get('/customerQuery', function(req, res, next) {
   res.render('customerQuery');
 });
 
-router.get('/orderModel', function(req, res, next) {
-  res.render('orderModel');
-});
-
-router.get('/orderDeal', function(req, res, next) {
-  res.render('orderDeal');
-});
-
-router.get('/orderRecord', function(req, res, next) {
-  res.render('orderRecord');
-});
-
 router.get('/reportOut', function(req, res, next) {
   res.render('reportOut');
 });
@@ -60,10 +48,6 @@ router.get('/callOut', function(req, res, next) {
 
 router.get('/callIn', function(req, res, next) {
   res.render('callIn');
-});
-
-router.get('/qcModel', function(req, res, next) {
-  res.render('qcModel');
 });
 
 router.get('/qcDeal', function(req, res, next) {

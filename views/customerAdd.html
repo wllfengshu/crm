@@ -75,35 +75,35 @@
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>姓名：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入顾客姓名" type='text' />
+															<input id='name' class="span4" placeholder="请输入顾客姓名" type='text' />
 														</div>
 													</div>
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>性别：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入顾客性别" type='text' />
+															<input id='sex' class="span4" placeholder="请输入顾客性别" type='text' />
 														</div>
 													</div>
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>电话：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入顾客电话" type='text' />
+															<input id='phone' class="span4" placeholder="请输入顾客电话" type='text' />
 														</div>
 													</div>
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>邮箱：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入顾客邮箱" type='text' />
+															<input id='email' class="span4" placeholder="请输入顾客邮箱" type='text' />
 														</div>
 													</div>
 													<div class='control-group info'>
 														<label class='control-label' for='inputInfo'>家庭住址：</label>
 														<div class='controls'>
-															<input id='' class="span4" placeholder="请输入顾客家庭住址" type='text' />
+															<input id='address' class="span4" placeholder="请输入顾客家庭住址" type='text' />
 														</div>
 													</div>
-													<div class=''>
-														<button class='btn btn-primary' type='submit'>
+													<div class='control-group info'>
+														<button id="customerAddBut" class='btn btn-primary' type='button'>
 									                        <i class='icon-save'></i>
 									                        	保存
 									                    </button>
@@ -124,6 +124,44 @@
 				</div>
 			</section>
 		</div>
+		<script type="text/javascript">
+	       $(function(){
+		        $("#customerAddBut").click(function(){
+			    	var params ={
+		    			name: $("#name").val(),
+		    			sex: $("#sex").val(),
+		    			phone: $("#phone").val(),
+		    			email: $("#email").val(),
+		    			address: $("#address").val(),
+		    			token:"crm"
+		    		};
+		    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
+			   		var userAllInfoJson=$.parseJSON(userAllInfo);
+			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
+			        var user=userAllInfoJson["user"];
+			        var user_id=user["id"];
+		    		var _headers= {
+						"sessionId":sessionId,
+						"user_id":user_id
+					}
+			    	$.ajax({
+					    url:'http://localhost:7001/customer/',
+					    type:'post',
+					    dataType:'text',
+					    data: JSON.stringify(params),
+					    headers:_headers,
+					    success: function(data){
+					    	alert("添加成功");
+					        $(".span4").val("");//清空输入框
+					    },
+					    error: function(res){
+					    	alert("添加失败");
+			            	alert("添加失败");
+			            }
+					});
+	    		});
+			});
+	    </script>
 	</body>
 
 </html>
