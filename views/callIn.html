@@ -110,10 +110,7 @@
 																<td v-text="todo.end_type_name"></td>
 																<td>
 																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-edit'></i>
-																	</a>
-																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-ok'></i>
+																		<i class='icon-book'></i>
 																	</a>
 																	<a class='btn btn-danger btn-mini' href='#'>
 																		<i class='icon-remove'></i>
@@ -162,10 +159,11 @@
 	       		}
 		        $("#queryBut").click(function(){
 			    	var params ={
-		    			_ani: $("#_ani").val(),
-		    			_dnis: $("#_dnis").val(),
+			    		domain:"",
+		    			ani: $("#_ani").val(),
+		    			dnis: $("#_dnis").val(),
 		    			pageNo:1,
-		    			pageSize:99,
+		    			pageSize:10,
 		    			token:"crm"
 		    		};
 		    		var paramsGetStr="?"+spliceGetStr(params);

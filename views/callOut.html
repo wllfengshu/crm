@@ -110,10 +110,7 @@
 																<td v-text="todo.end_type_name"></td>
 																<td>
 																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-edit'></i>
-																	</a>
-																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-ok'></i>
+																		<i class='icon-check'></i>
 																	</a>
 																	<a class='btn btn-danger btn-mini' href='#'>
 																		<i class='icon-remove'></i>
@@ -162,10 +159,11 @@
 	       		}
 		        $("#queryBut").click(function(){
 			    	var params ={
-		    			_ani: $("#_ani").val(),
-		    			_dnis: $("#_dnis").val(),
+			    		domain:"",
+		    			ani: $("#_ani").val(),
+		    			dnis: $("#_dnis").val(),
 		    			pageNo:1,
-		    			pageSize:99,
+		    			pageSize:10,
 		    			token:"crm"
 		    		};
 		    		var paramsGetStr="?"+spliceGetStr(params);
@@ -174,9 +172,11 @@
 			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
 			        var user=userAllInfoJson["user"];
 			        var user_id=user["id"];
+			        var tenant_id=user["tenant_id"];
 		    		var _headers= {
 						"sessionId":sessionId,
 						"user_id":user_id,
+						"tenant_id":tenant_id,
 						"call_type":"1"
 					}
 			    	$.ajax({

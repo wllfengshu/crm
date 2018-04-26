@@ -96,7 +96,7 @@
 																结束时间
 															</th>
 															<th>
-																录音文件大小（M）
+																文件大小（M）
 															</th>
 															<th>
 																操作
@@ -166,10 +166,10 @@
 	       		}
 		        $("#queryBut").click(function(){
 			    	var params ={
-		    			_ani: $("#_ani").val(),
-		    			_dnis: $("#_dnis").val(),
+		    			ani: $("#_ani").val(),
+		    			dnis: $("#_dnis").val(),
 		    			pageNo:1,
-		    			pageSize:99,
+		    			pageSize:10,
 		    			token:"crm"
 		    		};
 		    		var paramsGetStr="?"+spliceGetStr(params);
@@ -178,9 +178,11 @@
 			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
 			        var user=userAllInfoJson["user"];
 			        var user_id=user["id"];
+			        var tenant_id=user["tenant_id"];
 		    		var _headers= {
 						"sessionId":sessionId,
 						"user_id":user_id,
+						"tenant_id":tenant_id
 					}
 			    	$.ajax({
 					    url:'http://localhost:9002/operation/recording'+paramsGetStr,

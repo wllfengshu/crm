@@ -114,12 +114,9 @@
 																<td v-text="todo.result"></td>
 																<td>
 																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-edit'></i>
+																		<i class='icon-book'></i>
 																	</a>
-																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-ok'></i>
-																	</a>
-																	<a class='btn btn-danger btn-mini' href='#'>
+																	<a class='btn btn-danger btn-mini' href='#' disabled="disabled">
 																		<i class='icon-remove'></i>
 																	</a>
 																</td>
@@ -169,7 +166,7 @@
 		    			ani: $("#_ani").val(),
 		    			dnis: $("#_dnis").val(),
 		    			pageNo:1,
-		    			pageSize:99,
+		    			pageSize:10,
 		    			token:"crm"
 		    		};
 		    		var paramsGetStr="?"+spliceGetStr(params);
@@ -178,9 +175,11 @@
 			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
 			        var user=userAllInfoJson["user"];
 			        var user_id=user["id"];
+			        var tenant_id=user["tenant_id"];
 		    		var _headers= {
 						"sessionId":sessionId,
 						"user_id":user_id,
+						"tenant_id":tenant_id
 					}
 			    	$.ajax({
 					    url:'http://localhost:7005/qc/record'+paramsGetStr,
