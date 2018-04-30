@@ -57,7 +57,7 @@
 									</ul>
 								</div>
 							</div>
-							<div class='row-fluid'>
+							<div class='row-fluid' id="havaTable" >
 								<div class="span12 box ">
 	                                <a>姓名：</a>
 	                                <input class="" placeholder="请输入顾客姓名" id="_name" type="text">
@@ -67,7 +67,7 @@
 	                                &nbsp;&nbsp;
 	                                <a>邮箱：</a>
 	                                <input class="" placeholder="请输入顾客邮箱" id="_email" type="text">
-	                                <button id="queryBut" class="btn btn-primary btn-success">
+	                                <button @click="handQuery" class="btn btn-primary btn-success">
 			                            <i class="icon-search"></i>
 			                            	查询
 			                        </button>
@@ -85,7 +85,7 @@
 									<div class='box-content box-no-padding'>
 										<div class='responsive-table'>
 											<div class='scrollable-area'>
-												<table  id="havaTable"  class='table' style='margin-bottom:0;'>
+												<table class='table' style='margin-bottom:0;'>
 													<thead>
 														<tr>
 															<th>
@@ -113,21 +113,21 @@
 													</thead>
 													<tbody>
 														<template>
-															<tr v-for="todo in todos" >
-																<td v-text="todo.id"></td>
+															<tr v-for="(todo,index) in todos" class="trClass">
+																<td>{{index+1}}</td>
 																<td v-text="todo.name"></td>
 																<td v-text="todo.sex"></td>
 																<td v-text="todo.phone"></td>
 																<td v-text="todo.email"></td>
 																<td v-text="todo.address"></td>
 																<td>
-																	<a class='btn btn-success btn-mini' href='#'>
+																	<a @click="viewBut(index)" class='btn btn-success btn-mini viewClass' >
+																		<i class='icon-book'></i>
+																	</a>
+																	<a @click="editBut(index)" class='btn btn-success btn-mini editClass' >
 																		<i class='icon-edit'></i>
 																	</a>
-																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-ok'></i>
-																	</a>
-																	<a class='btn btn-danger btn-mini' href='#'>
+																	<a @click="removeBut(index)" class='btn btn-danger btn-mini removeClass' >
 																		<i class='icon-remove'></i>
 																	</a>
 																</td>
@@ -161,61 +161,147 @@
 			</section>
 		</div>
 		<script type="text/javascript">
-	       $(function(){
-	       		function spliceGetStr(params){//拼接get请求
-	       			var strTemp="";
-	       			for (var variable in params) {
-	       				strTemp+=variable+"="+params[variable]+"&"
-	       			}
-	       			if(strTemp.length>0){
-	       				strTemp=strTemp.substr(0,strTemp.length-1);
-	       			}
-	       			return strTemp;
-	       		}
-		        $("#queryBut").click(function(){
-			    	var params ={
-		    			name: $("#_name").val(),
-		    			phone: $("#_phone").val(),
-		    			email: $("#_email").val(),
-		    			pageNo:1,
-		    			pageSize:99,
-		    			token:"manage"
-		    		};
-		    		var paramsGetStr="?"+spliceGetStr(params);
-		    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
-			   		var userAllInfoJson=$.parseJSON(userAllInfo);
-			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
-			        var user=userAllInfoJson["user"];
-			        var user_id=user["id"];
-		    		var _headers= {
-						"sessionId":sessionId,
-						"user_id":user_id
+			$(function() {
+				var goodsVue =new Vue({
+					el:"#havaTable",
+					data:{
+						todos:''
+					},
+					methods:{
+						spliceGetStr:function(params){//拼接get请求
+							var strTemp="";
+			       			for (var variable in params) {
+			       				strTemp+=variable+"="+params[variable]+"&"
+			       			}
+			       			if(strTemp.length>0){
+			       				strTemp=strTemp.substr(0,strTemp.length-1);
+			       			}
+			       			return strTemp;
+						},
+						getItem:function(_self,index){//得到点击的是哪条数据,返回该条记录
+							var _todosStr=JSON.stringify(_self.todos);
+							var _todosArr=JSON.parse(_todosStr);
+							var _item=_todosArr[index];
+				    		return _item;
+						},
+						getItemId:function(_self,index){//得到点击的是哪条数据,返回该条记录的id
+							var _item=this.getItem(_self,index);
+							var _itemId=_item["id"];
+				    		return _itemId;
+						},
+						getDataBySession:function(){//从session中获取数据,拼接在header变量中
+							var userAllInfo=$.session.get("loginUserAllInfo_crm");
+					   		var userAllInfoJson=$.parseJSON(userAllInfo);
+					        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
+					        var user=userAllInfoJson["user"];
+					        var user_id=user["id"];
+				    		var _headers= {
+								"sessionId":sessionId,
+								"user_id":user_id
+							}
+				    		return _headers;
+						},
+						handQuery:function(){//点击查询按钮
+							var _self = this;
+							var params ={
+				    			name: $("#_name").val(),
+				    			phone: $("#_phone").val(),
+				    			email: $("#_email").val(),
+				    			pageNo:1,
+				    			pageSize:10,
+				    			token:"crm"
+				    		};
+				    		var paramsGetStr="?"+this.spliceGetStr(params);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		$.ajax({
+							    url:'http://localhost:7001/customer/'+paramsGetStr,
+							    type:'get',
+							    dataType:'text',
+							    headers:_headers,
+							    success: function(_data){
+							    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
+						        	var infoData=infoRes["data"];//取到data
+						        	if(infoData==""){
+						        		_self.todos = '';
+						        		alert("查询为空");
+						        	}else{
+						        		_self.todos = infoData;
+						        		console.log("获取到的数据是："+JSON.stringify(_self.todos));
+						        	}
+							    },
+							    error: function(res){
+					            	alert("查询失败");
+					            }
+							});
+						},
+						viewBut:function(index){//查看按钮
+							var _self = this;
+							//得到点击的是哪条数据
+							var _itemId=this.getItemId(_self,index);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		$.ajax({
+							    url:'http://localhost:7001/customer/'+_itemId,
+							    type:'get',
+							    dataType:'text',
+							    headers:_headers,
+							    success: function(_data){
+							    	alert(_data);
+							    },
+							    error: function(res){
+					            	alert("查看失败");
+					            }
+							});
+						},
+						editBut:function(index){//编辑按钮
+							var _self = this;
+							//得到点击的是哪条数据
+							var _itemId=this.getItemId(_self,index);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		//获取修改之前的数据
+				    		var _item=this.getItem(_self,index);
+				    		var params ={//不传token
+				    			customer:_item
+				    		};
+				    		$.ajax({
+							    url:'http://localhost:7001/customer/'+_itemId,
+							    type:'put',
+							    dataType:'text',
+							    data: JSON.stringify(params),
+							    headers:_headers,
+							    success: function(_data){
+							    	alert("修改成功");
+							    },
+							    error: function(res){
+					            	alert("编辑失败");
+					            }
+							});
+						},
+						removeBut:function(index){//删除按钮
+							var _self = this;
+							//得到点击的是哪条数据
+							var _itemId=this.getItemId(_self,index);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		$.ajax({
+							    url:'http://localhost:7001/customer/'+_itemId,
+							    type:'delete',
+							    dataType:'text',
+							    headers:_headers,
+							    success: function(_data){
+							    	alert("删除成功");
+							    	_self.todos.splice(index,1);//第一个参数是下标，第二个参数是删除的数量 
+							    },
+							    error: function(res){
+					            	alert("删除失败");
+					            }
+							});
+						}
 					}
-			    	$.ajax({
-					    url:'http://localhost:7001/customer/'+paramsGetStr,
-					    type:'get',
-					    dataType:'text',
-					    headers:_headers,
-					    success: function(_data){
-					    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
-				        	var infoData=infoRes["data"];//取到data
-				        	if(infoData==""){
-				        		alert("查询为空");
-				        	}else{
-				        		new Vue({
-					   				el:"#havaTable",
-					   				data:{
-					   					todos:infoData
-					   				}
-					   			});
-				        	}
-					    },
-					    error: function(res){
-			            	alert("查询失败");
-			            }
-					});
-	    		});
-			});
+				})
+			})
 	    </script>
 	</body>
 
