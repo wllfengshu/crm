@@ -67,7 +67,7 @@
 	                                &nbsp;&nbsp;
 	                                <a>邮箱：</a>
 	                                <input class="" placeholder="请输入顾客邮箱" id="_email" type="text">
-	                                <button @click="handQuery" class="btn btn-primary btn-success">
+	                                <button @click="queryBut(1)" class="btn btn-primary btn-success">
 			                            <i class="icon-search"></i>
 			                            	查询
 			                        </button>
@@ -121,10 +121,7 @@
 																<td v-text="todo.email"></td>
 																<td v-text="todo.address"></td>
 																<td>
-																	<a @click="viewBut(index)" class='btn btn-success btn-mini viewClass' >
-																		<i class='icon-book'></i>
-																	</a>
-																	<a @click="editBut(index)" class='btn btn-success btn-mini editClass' >
+																	<a @click="viewBut(index)" class='btn btn-success btn-mini editClass' data-toggle="modal" data-target="#myModal">
 																		<i class='icon-edit'></i>
 																	</a>
 																	<a @click="removeBut(index)" class='btn btn-danger btn-mini removeClass' >
@@ -135,19 +132,72 @@
 														</template>
 													</tbody>
 												</table>
+												<!-- 模态框（Modal）弹出框 -->
+												<div style="z-index: -99;" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+													<div class="modal-dialog">
+														<div class="modal-content">
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+																	&times;
+																</button>
+																<h4 class="modal-title" id="myModalLabel">
+																	顾客信息
+																</h4>
+															</div>
+															<div class="modal-body">
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>姓名：</label>
+																	<div class='controls'>
+																		<input id='viewName' class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>性别：</label>
+																	<div class='controls'>
+																		<input id='viewSex' class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>电话：</label>
+																	<div class='controls'>
+																		<input id='viewPhone' class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>邮箱：</label>
+																	<div class='controls'>
+																		<input id='viewEmail' class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>家庭住址：</label>
+																	<div class='controls'>
+																		<input id='viewAddress' class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+															</div>
+															<div class="modal-footer">
+																<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+																</button>
+																<button @click="editBut()" id="determineBut" type="button" class="btn btn-primary" data-dismiss="modal">
+																	确定
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
 												<div class="span6 text-right">
 													<div class="dataTables_paginate paging_bootstrap pagination pagination-small">
 														<ul>
-															<li class="prev disabled">
-																<a href="#">← Previous</a>
+															<li>
+																<strong >总条数：<a id="count">0</a></strong>
 															</li>
-															<li class="active">
-																<a href="#">1</a>
-															</li>
-															<li class="next disabled">
-																<a href="#">Next → </a>
+															<li>
+																<strong >总页数：<a id="countPage">1</a></strong>
 															</li>
 														</ul>
+														<!--以下nav是分页代码-->
+														<nav arialabel="page navigation" class="pagenavouter" id="PageNavId"></nav>
 													</div>
 												</div>
 											</div>
@@ -165,7 +215,9 @@
 				var goodsVue =new Vue({
 					el:"#havaTable",
 					data:{
-						todos:''
+						todos:'',
+						_index:1,//指示当前选择的是第几条数据
+						pageNavObj:null//分页的对象
 					},
 					methods:{
 						spliceGetStr:function(params){//拼接get请求
@@ -201,13 +253,25 @@
 							}
 				    		return _headers;
 						},
-						handQuery:function(){//点击查询按钮
+						loadPaging:function(count,_pageNo){//分页函数
+							var pageNum=Math.ceil(count/10);//计算总页数
+							$("#count").html(count);
+						    $("#countPage").html(pageNum<=0?1:pageNum);
+						    //下面开始分页
+				            this.pageNavObj = new PageNavCreate("PageNavId",{
+				                pageCount:pageNum,//总页数
+				                currentPage:_pageNo,//当前页
+				                perPageNum:5,//每页按钮数
+				            });
+				            this.pageNavObj.afterClick(this.sendQuery);
+						},
+						sendQuery:function(_pageNo){//发送ajax请求，获取指定条件的、带分页的数据
 							var _self = this;
 							var params ={
 				    			name: $("#_name").val(),
 				    			phone: $("#_phone").val(),
 				    			email: $("#_email").val(),
-				    			pageNo:1,
+				    			pageNo:_pageNo,
 				    			pageSize:10,
 				    			token:"crm"
 				    		};
@@ -222,12 +286,15 @@
 							    success: function(_data){
 							    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
 						        	var infoData=infoRes["data"];//取到data
+						        	var count=infoRes["count"];//取到数据总条数
+						        	var pageNum=Math.ceil(count/10);//计算总页数
 						        	if(infoData==""){
 						        		_self.todos = '';
 						        		alert("查询为空");
 						        	}else{
-						        		_self.todos = infoData;
+						        		_self.todos = infoData;//设置表格里面的数据
 						        		console.log("获取到的数据是："+JSON.stringify(_self.todos));
+						        		_self.loadPaging(count,_pageNo);//分页
 						        	}
 							    },
 							    error: function(res){
@@ -235,8 +302,12 @@
 					            }
 							});
 						},
-						viewBut:function(index){//查看按钮
+						queryBut:function(_pageNo){//点击查询按钮
+							this.sendQuery(_pageNo);
+						},
+						viewBut:function(index){//查看指定某一条的数据
 							var _self = this;
+							_self._index=index;//把查看的是哪一条记录下来
 							//得到点击的是哪条数据
 							var _itemId=this.getItemId(_self,index);
 				    		//从session中获取数据，拼接到header中
@@ -247,21 +318,39 @@
 							    dataType:'text',
 							    headers:_headers,
 							    success: function(_data){
-							    	alert(_data);
+							    	$("#myModal").css("z-index","");//让弹框显示出来
+							    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
+						        	var infoData=infoRes["data"];//取到data
+						        	if(infoData==""){
+						        		alert("操作异常");
+						        	}else{
+						        		$("#viewName").val(infoData["name"]); 
+						        		$("#viewSex").val(infoData["sex"]); 
+						        		$("#viewPhone").val(infoData["phone"]); 
+						        		$("#viewEmail").val(infoData["email"]); 
+						        		$("#viewAddress").val(infoData["address"]); 
+						        	}
 							    },
 							    error: function(res){
 					            	alert("查看失败");
 					            }
 							});
 						},
-						editBut:function(index){//编辑按钮
+						editBut:function(){//编辑按钮
 							var _self = this;
+							var index=_self._index;//拿到选择的哪一行
 							//得到点击的是哪条数据
 							var _itemId=this.getItemId(_self,index);
 				    		//从session中获取数据，拼接到header中
 				    		var _headers=this.getDataBySession();
 				    		//获取修改之前的数据
 				    		var _item=this.getItem(_self,index);
+				    		//整理新的数据
+				    		_item["name"]=$("#viewName").val();
+				    		_item["sex"]=$("#viewSex").val();
+				    		_item["phone"]=$("#viewPhone").val();
+				    		_item["email"]=$("#viewEmail").val();
+				    		_item["address"]=$("#viewAddress").val();
 				    		var params ={//不传token
 				    			customer:_item
 				    		};
@@ -273,6 +362,10 @@
 							    headers:_headers,
 							    success: function(_data){
 							    	alert("修改成功");
+							    	var _todosStr=JSON.stringify(_self.todos);
+									var _todosArr=JSON.parse(_todosStr);
+									_todosArr[index]=_item;
+							    	_self.todos = _todosArr;//更新显示的数据
 							    },
 							    error: function(res){
 					            	alert("编辑失败");
