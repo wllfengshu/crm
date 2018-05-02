@@ -15,7 +15,7 @@ nav.page-nav-outer .page-nav-inner {
 nav.page-nav-outer .pagination {
   float: left;
   padding-left: 0;
-  margin: 15px 0;
+  margin: 0;
   border-radius: 4px;
   display: inline-block;
 }

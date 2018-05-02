@@ -24,11 +24,11 @@ function PageNavCreate(id,props){
 
     this.target.innerHTML = "";
     $('<div class="page-nav-inner clearfloat">'+
-                    '<ul class="pagination">'+
+                    '<ul class="pagination" style="float:left;">'+
                     '</ul>'+
-                    '<div class="page-input-box">'+
-                        '<input type="text" values=""/>'+
-                        '<button class="btn-green">Go</button>'+
+                    '<div class="" style="width: 100px;float:left;margin:20px 0;">'+
+                        '<input type="text" values="" style="width: 40px;"/>'+
+                        '<button class="" style="width: 40px;">Go</button>'+
                     '</div>'+
                 '</div>').appendTo($(this.target));
     this.pageNavUl =  $(this.target).find("ul.pagination");
