@@ -52,14 +52,14 @@
 	                                </ul>
 								</div>
 							</div>
-							<div class='row-fluid'>
+							<div class='row-fluid' id="havaTable" >
 								<div class="span12 box ">
-	                                <a>坐席工号：</a>
-	                                <input class="" placeholder="请输入坐席工号" id="_ani" type="text">
+	                                <a>主叫号码：</a>
+	                                <input class="" placeholder="请输入主叫号码" id="_ani" type="text">
 	                                &nbsp;&nbsp;
-	                                <a>顾客电话：</a>
-	                                <input class="" placeholder="请输入顾客电话" id="_dnis" type="text">
-	                                <button id="queryBut" class="btn btn-primary btn-success">
+	                                <a>被叫号码：</a>
+	                                <input class="" placeholder="请输入被叫号码" id="_dnis" type="text">
+	                                <button  @click="queryBut(1)"  class="btn btn-primary btn-success">
 			                            <i class="icon-search"></i>
 			                            	查询
 			                        </button>
@@ -84,10 +84,10 @@
 																编号
 															</th>
 															<th>
-																顾客电话
+																主叫号码
 															</th>
 															<th>
-																坐席工号
+																被叫号码
 															</th>
 															<th>
 																呼入时间
@@ -105,39 +105,94 @@
 													</thead>
 													<tbody>
 														<template>
-															<tr v-for="todo in todos" >
-																<td v-text="todo.id"></td>
+															<tr v-for="(todo,index) in todos" class="trClass">
+																<td>{{index+1}}</td>
 																<td v-text="todo.ani"></td>
 																<td v-text="todo.dnis"></td>
 																<td v-text="todo.start_time"></td>
 																<td v-text="todo.end_time"></td>
 																<td v-text="todo.file_size"></td>
 																<td>
-																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-edit'></i>
-																	</a>
-																	<a class='btn btn-success btn-mini' href='#'>
-																		<i class='icon-ok'></i>
-																	</a>
-																	<a class='btn btn-danger btn-mini' href='#'>
-																		<i class='icon-remove'></i>
+																	<a @click="viewBut(index)" class='btn btn-success btn-mini editClass' data-toggle="modal" data-target="#myModal">
+																		<i class='icon-search'></i>
 																	</a>
 																</td>
 															</tr>
 														</template>
 													</tbody>
 												</table>
-												<div class="span6 text-right">
+												<!-- 模态框（Modal）弹出框 -->
+												<div style="z-index: -99;" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+													<div class="modal-dialog">
+														<div class="modal-content">
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+																	&times;
+																</button>
+																<h4 class="modal-title" id="myModalLabel">
+																	录音质检
+																</h4>
+															</div>
+															<div class="modal-body">
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>主叫号码：</label>
+																	<div class='controls'>
+																		<input id='viewAni' disabled="disabled" class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>被叫号码：</label>
+																	<div class='controls'>
+																		<input id='viewDnis' disabled="disabled" class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>开始时间：</label>
+																	<div class='controls'>
+																		<input id='viewStartTime' disabled="disabled" class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>结束时间：</label>
+																	<div class='controls'>
+																		<input id='viewEndTime' disabled="disabled" class="span12" value="默认值" type='text' />
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>录音文件：</label>
+																	<div class='controls'>
+																		<embed id="viewFilePath" autoplay="false" height="100" width="100" src=""></embed>
+																	</div>
+																</div>
+																<div class='control-group info'>
+																	<label class='control-label' for='inputInfo'>请打分（满分10分）：</label>
+																	<div class='controls'>
+																		<input id='result' class="span12" placeholder="默认值" type='number' />
+																	</div>
+																</div>
+															</div>
+															<div class="modal-footer">
+																<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+																</button>
+																<button @click="editBut()" id="determineBut" type="button" class="btn btn-primary" data-dismiss="modal">
+																	确定
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="">
 													<div class="dataTables_paginate paging_bootstrap pagination pagination-small">
 														<ul>
-															<li class="prev disabled">
-																<a href="#">← Previous</a>
+															<li>
+																<!--以下nav是分页代码-->
+																<nav arialabel="page navigation" class="pagenavouter" id="PageNavId"></nav>
 															</li>
-															<li class="active">
-																<a href="#">1</a>
+															<li>
+																<strong >总条数：<a id="count">0</a></strong>
 															</li>
-															<li class="next disabled">
-																<a href="#">Next → </a>
+															<li>
+																<strong >总页数：<a id="countPage">1</a></strong>
 															</li>
 														</ul>
 													</div>
@@ -153,62 +208,173 @@
 			</section>
 		</div>
 		<script type="text/javascript">
-	       $(function(){
-	       		function spliceGetStr(params){//拼接get请求
-	       			var strTemp="";
-	       			for (var variable in params) {
-	       				strTemp+=variable+"="+params[variable]+"&"
-	       			}
-	       			if(strTemp.length>0){
-	       				strTemp=strTemp.substr(0,strTemp.length-1);
-	       			}
-	       			return strTemp;
-	       		}
-		        $("#queryBut").click(function(){
-			    	var params ={
-		    			ani: $("#_ani").val(),
-		    			dnis: $("#_dnis").val(),
-		    			pageNo:1,
-		    			pageSize:10,
-		    			token:"crm"
-		    		};
-		    		var paramsGetStr="?"+spliceGetStr(params);
-		    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
-			   		var userAllInfoJson=$.parseJSON(userAllInfo);
-			        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
-			        var user=userAllInfoJson["user"];
-			        var user_id=user["id"];
-			        var tenant_id=user["tenant_id"];
-		    		var _headers= {
-						"sessionId":sessionId,
-						"user_id":user_id,
-						"tenant_id":tenant_id
+	        $(function() {
+				var goodsVue =new Vue({
+					el:"#havaTable",
+					data:{
+						todos:'',
+						_index:1,//指示当前选择的是第几条数据
+						pageNavObj:null//分页的对象
+					},
+					methods:{
+						spliceGetStr:function(params){//拼接get请求
+							var strTemp="";
+			       			for (var variable in params) {
+			       				strTemp+=variable+"="+params[variable]+"&"
+			       			}
+			       			if(strTemp.length>0){
+			       				strTemp=strTemp.substr(0,strTemp.length-1);
+			       			}
+			       			return strTemp;
+						},
+						getItem:function(_self,index){//得到点击的是哪条数据,返回该条记录
+							var _todosStr=JSON.stringify(_self.todos);
+							var _todosArr=JSON.parse(_todosStr);
+							var _item=_todosArr[index];
+				    		return _item;
+						},
+						getItemId:function(_self,index){//得到点击的是哪条数据,返回该条记录的id
+							var _item=this.getItem(_self,index);
+							var _itemId=_item["id"];
+				    		return _itemId;
+						},
+						getDataBySession:function(){//从session中获取数据,拼接在header变量中
+							var userAllInfo=$.session.get("loginUserAllInfo_crm");
+					   		var userAllInfoJson=$.parseJSON(userAllInfo);
+					        var sessionId=userAllInfoJson["id"];//返回的还是一个json对象
+					        var user=userAllInfoJson["user"];
+					        var user_id=user["id"];
+				    		var tenant_id=user["tenant_id"];
+				    		var _headers= {
+								"sessionId":sessionId,
+								"user_id":user_id,
+								"tenant_id":tenant_id
+							}
+				    		return _headers;
+						},
+						loadPaging:function(count,_pageNo){//分页函数
+							var pageNum=Math.ceil(count/10);//计算总页数
+							$("#count").html(count);
+						    $("#countPage").html(pageNum<=0?1:pageNum);
+						    //下面开始分页
+				            this.pageNavObj = new PageNavCreate("PageNavId",{
+				                pageCount:pageNum,//总页数
+				                currentPage:_pageNo,//当前页
+				                perPageNum:5,//每页按钮数
+				            });
+				            this.pageNavObj.afterClick(this.sendQuery);
+						},
+						sendQuery:function(_pageNo){//发送ajax请求，获取指定条件的、带分页的数据
+							var _self = this;
+							var params ={
+				    			ani: $("#_ani").val(),
+				    			dnis: $("#_dnis").val(),
+				    			pageNo:_pageNo,
+				    			pageSize:10,
+				    			token:"crm"
+				    		};
+				    		var paramsGetStr="?"+this.spliceGetStr(params);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		$.ajax({
+							    url:'http://localhost:9002/operation/recording/'+paramsGetStr,
+							    type:'get',
+							    dataType:'text',
+							    headers:_headers,
+							    success: function(_data){
+							    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
+						        	var infoData=infoRes["data"];//取到data
+						        	var count=infoRes["count"];//取到数据总条数
+						        	var pageNum=Math.ceil(count/10);//计算总页数
+						        	if(infoData==""){
+						        		_self.todos = '';
+						        		alert("查询为空");
+						        		_self.loadPaging(0,1); //分页
+						        	}else{
+						        		_self.todos = infoData;//设置表格里面的数据
+						        		console.log("获取到的数据是："+JSON.stringify(_self.todos));
+						        		_self.loadPaging(count,_pageNo);//分页
+						        	}
+							    },
+							    error: function(res){
+					            	alert("查询失败");
+					            }
+							});
+						},
+						queryBut:function(_pageNo){//点击查询按钮
+							this.sendQuery(_pageNo);
+						},
+						viewBut:function(index){//查看指定某一条的数据
+							var _self = this;
+							_self._index=index;//把查看的是哪一条记录下来
+							//得到点击的是哪条数据
+							var _itemId=this.getItemId(_self,index);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		$.ajax({
+							    url:'http://localhost:9002/operation/recording/'+_itemId,
+							    type:'get',
+							    dataType:'text',
+							    headers:_headers,
+							    success: function(_data){
+							    	$("#myModal").css("z-index","");//让弹框显示出来
+							    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
+						        	var infoData=infoRes["data"];//取到data
+						        	if(infoData==""){
+						        		alert("操作异常");
+						        	}else{
+						        		$("#viewAni").val(infoData["ani"]); 
+						        		$("#viewDnis").val(infoData["dnis"]); 
+						        		$("#viewStartTime").val(infoData["start_time"]); 
+						        		$("#viewEndTime").val(infoData["end_time"]); 
+						        		$("#viewFilePath").attr("src",infoData["file_place"]);
+						        	}
+							    },
+							    error: function(res){
+					            	alert("查看失败");
+					            }
+							});
+						},
+						editBut:function(){//编辑按钮
+							var result=$("#result").val();
+							if(result==null || result ==undefined || result=="" || result<0 || result>=10){
+								alert("请输入正确的分值");
+								return;
+							}
+							var _self = this;
+							var index=_self._index;//拿到选择的哪一行
+							//得到点击的是哪条数据
+							var _itemId=this.getItemId(_self,index);
+				    		//从session中获取数据，拼接到header中
+				    		var _headers=this.getDataBySession();
+				    		//获取修改之前的数据
+				    		var _item=this.getItem(_self,index);
+				    		//整理新的数据
+				    		_item["result"]=$("#result").val();
+				    		var params ={//不传token
+				    			record:_item
+				    		};
+				    		$.ajax({
+							    url:'http://localhost:7005/qc/record',
+							    type:'post',
+							    dataType:'text',
+							    data: JSON.stringify(params),
+							    headers:_headers,
+							    success: function(_data){
+							    	alert("质检成功");
+							    	var _todosStr=JSON.stringify(_self.todos);
+									var _todosArr=JSON.parse(_todosStr);
+									_todosArr.remove(index);//移除已经质检的，注但是后端没有做标记...
+							    	_self.todos = _todosArr;//更新显示的数据
+							    },
+							    error: function(res){
+					            	alert("质检失败");
+					            }
+							});
+						}
 					}
-			    	$.ajax({
-					    url:'http://localhost:9002/operation/recording'+paramsGetStr,
-					    type:'get',
-					    dataType:'text',
-					    headers:_headers,
-					    success: function(_data){
-					    	var infoRes=$.parseJSON(_data);//返回的数据，包含时间戳等
-				        	var infoData=infoRes["data"];//取到data
-				        	if(infoData==""){
-				        		alert("查询为空");
-				        	}else{
-				        		new Vue({
-					   				el:"#havaTable",
-					   				data:{
-					   					todos:infoData
-					   				}
-					   			});
-				        	}
-					    },
-					    error: function(res){
-			            	alert("查询失败");
-			            }
-					});
-	    		});
-			});
+				})
+			})
 	    </script>
 	</body>
 </html>
