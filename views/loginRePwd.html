@@ -8,22 +8,67 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link rel="shortcut icon" href="assets/images/favicon.ico">
+		<% include ./components/scriptJS.html %>
 	</head>
 
 	<body>
 		<!--element start here-->
 		<div class="elelment">
 			<h2 style="color: #FFFFFF;">欢迎登录CRM系统</h2>
-			<div class="element-main" style="padding-bottom: 30px;">
+			<div  id="havaTable" class="element-main" style="padding-bottom: 30px;">
 				<h1>忘记密码？</h1>
 				<p> 在这个页面，您可以输入您的邮箱来重置密码。</p>
-				<form>
-					<input type="text" value="输入您的邮箱" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '请输入您的邮箱';}">
-					<input type="submit" value="开始重置">
-				</form>
+				<fo-rm>
+					<input id="email" type="text" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '请输入您的邮箱';}">
+					<input @click="sendEamil" type="submit" value="开始重置">
+				</fo-rm>
 				<a href="login">我要登录</a>
 			</div>
 		</div>
+		<script type="text/javascript">
+			$(function() {
+				var goodsVue =new Vue({
+					el:"#havaTable",
+					data:{
+						todos:'',
+						_index:1,//指示当前选择的是第几条数据
+						pageNavObj:null//分页的对象
+					},
+					methods:{
+						spliceGetStr:function(params){//拼接get请求
+							var strTemp="";
+			       			for (var variable in params) {
+			       				strTemp+=variable+"="+params[variable]+"&"
+			       			}
+			       			if(strTemp.length>0){
+			       				strTemp=strTemp.substr(0,strTemp.length-1);
+			       			}
+			       			return strTemp;
+						},
+						sendEamil:function(){//发送ajax请求
+							var _self = this;
+							var params ={
+				    			email: $("#email").val(),
+				    		};
+				    		var paramsGetStr="?"+this.spliceGetStr(params);
+				    		//从session中获取数据，拼接到header中
+				    		$.ajax({
+							    url:'http://localhost:9001/security/forget/sendEmail'+paramsGetStr,
+							    type:'get',
+							    dataType:'text',
+							    success: function(_data){
+							    	alert("邮件发送成功，请在您的邮箱中进行查收");
+							    	window.location.href = '/login';
+							    },
+							    error: function(res){
+					            	alert("请检查您的邮箱是否正确。");
+					            }
+							});
+						}
+					}
+				})
+			})
+	    </script>
 	</body>
 
 </html>

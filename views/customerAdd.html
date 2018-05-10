@@ -126,13 +126,30 @@
 		</div>
 		<script type="text/javascript">
 	       $(function(){
+	       		function checkNull(modelType){
+	       			if(null == modelType || "undefined" == typeof(modelType) || "" == modelType){
+			            alert("输入不能为空");
+			            throw new Error("输入有误，js终止执行");
+			            return;
+			        }
+	       		}
 		        $("#customerAddBut").click(function(){
+			    	var _name=  $("#name").val();
+	    			var _sex=  $("#sex").val();
+	    			var _phone=  $("#phone").val();
+	    			var _email=  $("#email").val();
+	    			var _address=  $("#address").val();
+			    	checkNull(_name);
+			    	checkNull(_sex);
+			    	checkNull(_phone);
+			    	checkNull(_email);
+			    	checkNull(_address);
 			    	var params ={
-		    			name: $("#name").val(),
-		    			sex: $("#sex").val(),
-		    			phone: $("#phone").val(),
-		    			email: $("#email").val(),
-		    			address: $("#address").val(),
+		    			name: _name,
+		    			sex: _sex,
+		    			phone: _phone,
+		    			email: _email,
+		    			address: _address,
 		    			token:"crm"
 		    		};
 		    		var userAllInfo=$.session.get("loginUserAllInfo_crm");
@@ -156,7 +173,6 @@
 					    },
 					    error: function(res){
 					    	alert("添加失败");
-			            	alert("添加失败");
 			            }
 					});
 	    		});

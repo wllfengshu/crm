@@ -227,6 +227,7 @@
 						        	var pageNum=Math.ceil(count/10);//计算总页数
 						        	if(infoData==""){
 						        		_self.todos = '';
+						        		_self.loadPaging(0,1);//分页
 						        		alert("查询为空");
 						        	}else{
 						        		_self.todos = infoData;//设置表格里面的数据
