@@ -160,8 +160,10 @@
 																</div>
 																<div class='control-group info'>
 																	<label class='control-label' for='inputInfo'>录音文件：</label>
-																	<div class='controls'>
-																		<embed id="viewFilePath" autoplay="false" height="100" width="100" src=""></embed>
+																	<div class='controls' id="musID">
+																		<!--<embed id="viewFilePath" autoplay="false" height="100" width="100"></embed>-->
+																		<audio id="viewFilePath" autoplay="false"  preload="auto"></audio>
+																		<a @click="conBut()" id="conFlag">播放</a>
 																	</div>
 																</div>
 																<div class='control-group info'>
@@ -214,7 +216,8 @@
 					data:{
 						todos:'',
 						_index:1,//指示当前选择的是第几条数据
-						pageNavObj:null//分页的对象
+						pageNavObj:null,//分页的对象
+						_flag:false
 					},
 					methods:{
 						spliceGetStr:function(params){//拼接get请求
@@ -327,7 +330,9 @@
 						        		$("#viewDnis").val(infoData["dnis"]); 
 						        		$("#viewStartTime").val(infoData["start_time"]); 
 						        		$("#viewEndTime").val(infoData["end_time"]); 
-						        		$("#viewFilePath").attr("src",infoData["file_place"]);
+						        		$("#viewFilePath").attr("src","home/listen/Apps/recording/0.mp3");//录音文件数量太大，加载过慢,因此在此设定为播放同一条语音
+						        		$("#musID audio")[0].pause();
+						        		_self._flag=true;
 						        	}
 							    },
 							    error: function(res){
@@ -371,6 +376,20 @@
 					            	alert("质检失败");
 					            }
 							});
+						},
+						conBut:function(){//控制录音的播放和暂停
+							var _self = this;
+							var flag=_self._flag;
+							if(flag){
+								$("#conFlag").html("暂停");
+								$("#musID audio")[0].play();
+								_self._flag=false;
+							}else{
+								$("#conFlag").html("开始");
+								$("#musID audio")[0].pause();
+								_self._flag=true;
+							}
+							
 						}
 					}
 				})

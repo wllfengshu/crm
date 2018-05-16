@@ -389,6 +389,13 @@
 							    success: function(_data){
 							    	alert("删除成功");
 							    	_self.todos.splice(index,1);//第一个参数是下标，第二个参数是删除的数量 
+							    	//取删除之前的数据条数，再减一更新上去
+							    	var oldCount=$("#count").text();
+							    	var oldCountPage=$("#countPage").text();
+							    	var oldCountInt=parseInt(oldCount)-1;
+							    	var oldCountPageInt=parseInt(oldCountPage)-1;
+							    	$("#count").html(oldCountInt);
+						    		$("#countPage").html(oldCountPageInt);
 							    },
 							    error: function(res){
 					            	alert("删除失败");
